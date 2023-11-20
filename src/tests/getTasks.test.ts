@@ -1,13 +1,15 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "../database/prisma";
 import { category } from "./mocks/category.mocks";
-import { taskList } from "./mocks/tasks.mocks";
+import { getTaskList } from "./mocks/tasks.mocks";
 import { request } from "./setupFiles";
 import { taskDefaultExpects } from "./utils/taskDefaultExpects";
+import { categoryDefaultExpects } from "./utils/categoryDefaultExpects";
 
 describe("get tasks", () => {
    beforeEach(async () => {
       await prisma.category.create({ data: category });
+      const taskList = await getTaskList();
       await prisma.task.createMany({ data: taskList });
    });
 
@@ -21,14 +23,11 @@ describe("get tasks", () => {
 
       taskDefaultExpects(data[0]);
 
-      expect(data[0].category).toBeUndefined();
+      expect(data[0].category).toBeNull();
 
       taskDefaultExpects(data[1]);
 
-      expect(data[1].category).toBeDefined();
-      expect(data[1].category).toBeTypeOf("object");
-      expect(data[1].category.name).toBeDefined();
-      expect(data[1].category.name).toBeTypeOf("string");
+      categoryDefaultExpects(data[1].category);
    });
 
    it("should be able to get tasks from specific category", async () => {
@@ -43,32 +42,36 @@ describe("get tasks", () => {
 
       taskDefaultExpects(data[0]);
 
-      expect(data[0].category).toBeDefined();
-      expect(data[0].category).toBeTypeOf("object");
-      expect(data[0].category.name).toBeDefined();
-      expect(data[0].category.name).toBeTypeOf("string");
+      categoryDefaultExpects(data[0].category);
+   });
+
+   it("should throw error when you try to get tasks from a invalid category", async () => {
+      const category = await prisma.category.findFirst();
+
+      const id = (category?.id as number) + 1;
+
+      await request.get(`/tasks?category=${id}`).expect(404);
+
+
    });
 
    it("should be able to get a single task by the id correctly", async () => {
-      const categories = await prisma.category.findMany();
+      const tasks = await prisma.task.findMany();
 
       const data = await request
-         .get(`/tasks/${categories[1].id}`)
+         .get(`/tasks/${tasks[1].id}`)
          .expect(200)
          .then((response) => response.body);
 
-      taskDefaultExpects(data[0]);
+      taskDefaultExpects(data);
 
-      expect(data[0].category).toBeDefined();
-      expect(data[0].category).toBeTypeOf("object");
-      expect(data[0].category.name).toBeDefined();
-      expect(data[0].category.name).toBeTypeOf("string");
+      categoryDefaultExpects(data.category);
    });
 
    it("should be throw error when try get a task with a invalid id", async () => {
-      const categories = await prisma.category.findMany();
+      const tasks = await prisma.task.findMany();
 
-      const id = categories[1].id + 1;
+      const id = tasks[1].id + 1;
 
       await request.get(`/tasks/${id}`).expect(404);
    });
