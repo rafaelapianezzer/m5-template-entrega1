@@ -4,16 +4,21 @@
   "description": "Está documentação servirá de base para entrega, todas se comportar assim como está previsto na documentação abaixo:",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "dotenv -e .env.develop -- tsnd --respawn src/server.ts",
+    "test": "dotenv -e .env.test -- vitest",
+    "migrate:dev": "dotenv -e .env.develop -- npx prisma migrate deploy"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/express": "^4.17.21",
+    "@types/supertest": "^2.0.16",
     "prisma": "^5.6.0",
+    "supertest": "^6.3.3",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.3.2"
+    "typescript": "^5.3.2",
+    "vitest": "^0.34.6"
   },
   "dependencies": {
     "@prisma/client": "^5.6.0",
