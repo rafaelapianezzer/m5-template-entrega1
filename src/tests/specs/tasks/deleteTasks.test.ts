@@ -8,7 +8,7 @@ describe("delete task", () => {
         await prisma.task.create({ data: task });
     })
 
-    it("should be able to delete a task sucessfully", async () => {
+    it("should be able to delete task sucessfully", async () => {
         const task = await prisma.task.findFirst();
 
         await request.delete(`/tasks/${task?.id}`).expect(204);
