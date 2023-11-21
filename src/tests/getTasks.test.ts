@@ -13,7 +13,7 @@ describe("get tasks", () => {
       await prisma.task.createMany({ data: taskList });
    });
 
-   it("should be able to get tasks sucessfully", async () => {
+   it("should be able to get tasks successfully", async () => {
       const data = await request
          .get("/tasks")
          .expect(200)
