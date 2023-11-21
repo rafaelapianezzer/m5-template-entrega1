@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { prisma } from "../database/prisma";
-import { category } from "./mocks/category.mocks";
-import { getTaskList } from "./mocks/tasks.mocks";
-import { request } from "./setupFiles";
-import { taskDefaultExpects } from "./utils/taskDefaultExpects";
-import { categoryDefaultExpects } from "./utils/categoryDefaultExpects";
+import { prisma } from "../../../database/prisma";
+import { category } from "../../mocks/category.mocks";
+import { getTaskList } from "../../mocks/tasks.mocks";
+import { request } from "../../setupFiles";
+import { taskDefaultExpects } from "../../utils/taskDefaultExpects";
+import { categoryDefaultExpects } from "../../utils/categoryDefaultExpects";
 
 describe("get tasks", () => {
    beforeEach(async () => {

@@ -1,7 +1,7 @@
 import { beforeEach, describe, it } from "vitest";
-import { prisma } from "../database/prisma";
-import { task } from "./mocks/tasks.mocks";
-import { request } from "./setupFiles";
+import { prisma } from "../../../database/prisma";
+import { task } from "../../mocks/tasks.mocks";
+import { request } from "../../setupFiles";
 
 describe("delete task", () => {
     beforeEach(async () => {
