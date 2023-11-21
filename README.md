@@ -1,6 +1,6 @@
 # M5 - Entrega 1 - Gerenciamento de Tarefas API
 
-Está documentação servirá de base para entrega, todas se comportar assim como está previsto na documentação abaixo:
+Está documentação servirá de base para entrega, todas as rotas deverão se comportar assim como está previsto na documentação abaixo:
 
 ### Criação de tarefa POST /tasks
 
