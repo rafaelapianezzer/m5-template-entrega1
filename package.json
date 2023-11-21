@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "dev": "dotenv -e .env.develop -- tsnd --respawn src/server.ts",
+    "migrate:dev": "dotenv -e .env.develop -- npx prisma migrate dev",
     "test": "dotenv -e .env.test -- vitest",
-    "migrate:dev": "dotenv -e .env.develop -- npx prisma migrate deploy"
+    "migrate:test": "dotenv -e .env.test -- npx prisma migrate dev"
+    
   },
   "keywords": [],
   "author": "",
