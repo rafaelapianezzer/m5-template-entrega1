@@ -186,9 +186,9 @@ STATUS (409) quando o corpo não é compatível com o padrão
 
 Está rota não tem um corpo de resposta (STATUS: 204)
 
-STATUS (404) - Categoria inválida
-
 #### Possíveis erros:
+
+STATUS (404) - Categoria inválida
 
 ```json
 {
