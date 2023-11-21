@@ -26,7 +26,7 @@ Padrão de resposta  (STATUS: 201)
 }    
 ```
 
-Possíveis erros
+#### Possíveis erros:
 
 STATUS (404) - Categoria inválida
 
@@ -63,6 +63,16 @@ URL Search Params
 | ------ | ------ | ------ |
 | category | /tasks?category=estudo | Forneça o "id" da categoria para trazer somente tarefas da categoria determinada |
 
+#### Possíveis erros:
+
+STATUS (404) - Categoria inválida
+
+```json
+{
+    "message": "Category not found"
+}
+```
+
 ### Leitura de individual GET /tasks/:1
 
 Padrão de resposta  (STATUS: 200)
@@ -80,7 +90,7 @@ Padrão de resposta  (STATUS: 200)
 }   
 ```
 
-Possíveis errors
+#### Possíveis erros:
 
 STATUS (404) - Tarefa inválida
 
@@ -115,7 +125,7 @@ Padrão de resposta (STATUS: 200)
 }    
 ```
 
-Possíveis erros
+#### Possíveis erros:
 
 STATUS (404) - Tarefa inválida
 
@@ -139,7 +149,7 @@ STATUS (409) quando o corpo não é compatível com o padrão
 
 Está rota não tem um corpo de resposta (STATUS: 204)
 
-Possíveis erros:
+#### Possíveis erros:
 
 STATUS (404) - Tarefa inválida
 
@@ -168,7 +178,7 @@ Padrão de resposta (STATUS 201)
 }
 ```
 
-Possíveis erros
+#### Possíveis erros:
 
 STATUS (409) quando o corpo não é compatível com o padrão
 
@@ -177,6 +187,8 @@ STATUS (409) quando o corpo não é compatível com o padrão
 Está rota não tem um corpo de resposta (STATUS: 204)
 
 STATUS (404) - Categoria inválida
+
+#### Possíveis erros:
 
 ```json
 {
