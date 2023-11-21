@@ -26,22 +26,34 @@ Padrão de resposta  (STATUS: 201)
 }    
 ```
 
+Possíveis erros
+
+STATUS (404) - Categoria inválida
+
+```json
+{
+    "message": "Category not found"
+}
+```
+
+STATUS (409) quando o corpo não é compatível com o padrão
+
 ### Leitura de tarefas GET /tasks
 
 Padrão de resposta  (STATUS: 200)
 
 ```json
 [
-{
-    "id": 1,
-    "title": "Lorem ipsum",
-    "content": "Lorem ipsum",
-    "finished": false,
-    "category": {
+    {
         "id": 1,
-        "name": "Estudo",
-    }
-}  
+        "title": "Lorem ipsum",
+        "content": "Lorem ipsum",
+        "finished": false,
+        "category": {
+            "id": 1,
+            "name": "Estudo",
+        }
+    }  
 ]  
 ```
 
@@ -66,6 +78,16 @@ Padrão de resposta  (STATUS: 200)
         "name": "Estudo"
     }
 }   
+```
+
+Possíveis errors
+
+STATUS (404) - Tarefa inválida
+
+```json
+{
+    "message": "Task not found"
+}
 ```
 
 ### Atualizar tarefa PATCH /tasks/:id
@@ -93,9 +115,39 @@ Padrão de resposta (STATUS: 200)
 }    
 ```
 
+Possíveis erros
+
+STATUS (404) - Tarefa inválida
+
+```json
+{
+    "message": "Task not found"
+}
+```
+
+STATUS (404) - Categoria inválida
+
+```json
+{
+    "message": "Category not found"
+}
+```
+
+STATUS (409) quando o corpo não é compatível com o padrão
+
 ### Excluir tarefa PATCH /tasks/:id
 
 Está rota não tem um corpo de resposta (STATUS: 204)
+
+Possíveis erros:
+
+STATUS (404) - Tarefa inválida
+
+```json
+{
+    "message": "Task not found"
+}
+```
 
 ### Criação de categoria POST /categories
 
@@ -116,6 +168,18 @@ Padrão de resposta (STATUS 201)
 }
 ```
 
+Possíveis erros
+
+STATUS (409) quando o corpo não é compatível com o padrão
+
 ### Exclusão de categoria POST
 
 Está rota não tem um corpo de resposta (STATUS: 204)
+
+STATUS (404) - Categoria inválida
+
+```json
+{
+    "message": "Category not found"
+}
+```
