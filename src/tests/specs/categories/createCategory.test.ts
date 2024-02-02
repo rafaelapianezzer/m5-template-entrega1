@@ -21,10 +21,10 @@ describe("create category", async () => {
    });
 
    it("should throw error when try to create a task with a missing body parameter", async () => {
-      await request.post("/categories").expect(409);
+      await request.post("/categories").expect(400);
    });
 
    it("should throw error when try to create a task with invalid data types", async () => {
-      await request.post("/categories").send(invalidDataCategory).expect(409);
+      await request.post("/categories").send(invalidDataCategory).expect(400);
    });
 });

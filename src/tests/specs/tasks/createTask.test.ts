@@ -19,10 +19,10 @@ describe("create task", () => {
    });
 
    it("should throw error when try to create a task with a missing body parameter", async () => {
-      await request.post("/tasks").expect(409);
+      await request.post("/tasks").expect(400);
    })
 
    it("should throw error when try to create a task with invalid data types", async () => {
-      await request.post("/tasks").send(invalidDataTask).expect(409);
+      await request.post("/tasks").send(invalidDataTask).expect(400);
    })
 });

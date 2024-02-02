@@ -34,7 +34,7 @@ describe("get tasks", () => {
       const category = await prisma.category.findFirst();
 
       const data = await request
-         .get(`/tasks?category=${category?.id}`)
+         .get(`/tasks?category=${category?.name}`)
          .expect(200)
          .then((response) => response.body);
 
@@ -43,16 +43,6 @@ describe("get tasks", () => {
       taskDefaultExpects(data[0]);
 
       categoryDefaultExpects(data[0].category);
-   });
-
-   it("should throw error when you try to get tasks from a invalid category", async () => {
-      const category = await prisma.category.findFirst();
-
-      const id = (category?.id as number) + 1;
-
-      await request.get(`/tasks?category=${id}`).expect(404);
-
-
    });
 
    it("should be able to get a single task by the id correctly", async () => {

@@ -42,6 +42,6 @@ describe("update task", () => {
    it("should throw error when try to update a task with invalid data types", async () => {
       const task = await prisma.task.findFirst();
 
-      await request.patch(`/tasks/${task?.id}`).send(invalidDataUpdateTask).expect(409);
+      await request.patch(`/tasks/${task?.id}`).send(invalidDataUpdateTask).expect(400);
    })
 });
