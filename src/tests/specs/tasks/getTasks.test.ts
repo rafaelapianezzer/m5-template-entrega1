@@ -1,61 +1,100 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "../../../database/prisma";
-import { category } from "../../mocks/category.mocks";
-import { getTaskList } from "../../mocks/tasks.mocks";
 import { request } from "../../setupFiles";
-import { categoryDefaultExpects } from "../../utils/categoryDefaultExpects";
-import { taskDefaultExpects } from "../../utils/taskDefaultExpects";
+import { Prisma, Category, Task } from "@prisma/client";
 
 describe("get tasks", () => {
+  let taskDataList: Prisma.TaskCreateManyInput[];
+  let createdCategory: Category;
+  let createdTasks: Task[];
+
   beforeEach(async () => {
-    await prisma.category.create({ data: category });
-    const taskList = await getTaskList();
-    await prisma.task.createMany({ data: taskList });
+    createdCategory = await prisma.category.create({
+      data: { name: "Example" },
+    });
+
+    taskDataList = [
+      {
+        title: "Lorem ipsum",
+        content: "Lorem ipsum",
+      },
+      {
+        title: "Lorem ipsum",
+        content: "Lorem ipsum",
+        categoryId: createdCategory?.id,
+      },
+    ];
+
+    await prisma.task.createMany({ data: taskDataList });
+    createdTasks = await prisma.task.findMany();
   });
 
-  it("should be able to get tasks successfully", async () => {
-    const data = await request
-      .get("/tasks")
-      .expect(200)
-      .then((response) => response.body);
+  it("should be able to list all tasks successfully", async () => {
+    const response = await request.get("/tasks");
 
-    expect(data).toHaveLength(2);
+    const expectedBody = [
+      {
+        id: createdTasks[0].id,
+        title: taskDataList[0].title,
+        content: taskDataList[0].content,
+        finished: false,
+        category: null,
+      },
+      {
+        id: createdTasks[1].id,
+        title: taskDataList[1].title,
+        content: taskDataList[1].content,
+        finished: false,
+        category: { id: createdCategory?.id, name: createdCategory?.name },
+      },
+    ];
 
-    taskDefaultExpects(data[0]);
-
-    expect(data[0].category).toBeNull();
-
-    taskDefaultExpects(data[1]);
-    categoryDefaultExpects(data[1].category);
+    expect(response.body).toEqual(expectedBody);
+    expect(response.statusCode).toBe(200);
   });
 
-  it("should be able to get tasks from specific category", async () => {
-    const category = await prisma.category.findFirst();
+  it("should be able to get tasks from specific category name query param", async () => {
+    const response = await request.get(
+      `/tasks?category=${createdCategory?.name}`
+    );
 
-    const data = await request
-      .get(`/tasks?category=${category?.name}`)
-      .expect(200)
-      .then((response) => response.body);
+    const expectedBody = [
+      {
+        id: createdTasks[1].id,
+        title: taskDataList[1].title,
+        content: taskDataList[1].content,
+        finished: false,
+        category: { id: createdCategory?.id, name: createdCategory?.name },
+      },
+    ];
 
-    expect(data).toHaveLength(1);
-
-    taskDefaultExpects(data[0]);
-    categoryDefaultExpects(data[0].category);
+    expect(response.body).toEqual(expectedBody);
+    expect(response.statusCode).toBe(200);
   });
 
-  it("should be able to get a single task by the id correctly", async () => {
-    const tasks = await prisma.task.findMany();
+  it("should be able to get a single task by id", async () => {
+    const response = await request.get(`/tasks/${createdTasks[1].id}`);
 
-    const data = await request
-      .get(`/tasks/${tasks[1].id}`)
-      .expect(200)
-      .then((response) => response.body);
+    const expectedBody = {
+      id: createdTasks[1].id,
+      title: taskDataList[1].title,
+      content: taskDataList[1].content,
+      finished: false,
+      category: { id: createdCategory?.id, name: createdCategory?.name },
+    };
 
-    taskDefaultExpects(data);
-    categoryDefaultExpects(data.category);
+    expect(response.body).toEqual(expectedBody);
+    expect(response.statusCode).toBe(200);
   });
 
-  it("should be throw error when try get a task with a invalid id", async () => {
-    await request.get("/tasks/999").expect(404);
+  it("should return an error getting a task with non existing id", async () => {
+    const response = await request.get("/tasks/99999");
+
+    const expectedBody = {
+      message: "Task not found",
+    };
+
+    expect(response.body).toEqual(expectedBody);
+    expect(response.statusCode).toBe(404);
   });
 });
