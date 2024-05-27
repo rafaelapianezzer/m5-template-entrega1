@@ -1,50 +1,101 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "../../../database/prisma";
-import { category } from "../../mocks/category.mocks";
-import {
-   getTaskList,
-   invalidDataUpdateTask,
-   updateTask,
-} from "../../mocks/tasks.mocks";
 import { request } from "../../setupFiles";
-import { taskDefaultExpects } from "../../utils/taskDefaultExpects";
 
 describe("update task", () => {
   beforeEach(async () => {
-    await prisma.category.create({ data: category });
-    const taskList = await getTaskList();
-    await prisma.task.createMany({ data: taskList });
+    const createdCategory = await prisma.category.create({
+      data: { name: "Example" },
+    });
+
+    const taskDataList = [
+      {
+        title: "Lorem ipsum",
+        content: "Lorem ipsum",
+      },
+      {
+        title: "Lorem ipsum",
+        content: "Lorem ipsum",
+        categoryId: createdCategory?.id,
+      },
+    ];
+
+    await prisma.task.createMany({ data: taskDataList });
   });
 
-  it("should be able to update task successfully ", async () => {
+  it("should be able to update a task successfully", async () => {
     const task = await prisma.task.findFirst();
 
-    const data = await request
-      .patch(`/tasks/${task?.id}`)
-      .send(updateTask)
-      .expect(200)
-      .then((response) => response.body);
+    const updateTask = {
+      title: "Updated title",
+      content: "Updated content",
+      finished: true,
+    };
 
-    taskDefaultExpects(data);
+    const response = await request.patch(`/tasks/${task?.id}`).send(updateTask);
 
-    expect(data.title).toBe(updateTask.title);
-    expect(data.content).toBe(updateTask.content);
-    expect(data.finished).toBe(updateTask.finished);
+    const expectedBody = {
+      id: expect.any(Number),
+      title: updateTask.title,
+      content: updateTask.content,
+      finished: updateTask.finished,
+      categoryId: null,
+    };
+
+    expect(response.body).toEqual(expectedBody);
+    expect(response.statusCode).toBe(200);
   });
 
-  it("should throw error when try to update a invalid task", async () => {
-    await request
-      .patch("/tasks/999")
-      .expect(404)
-      .then((response) => response.body);
+  it("should return an error updating a task with non existing id", async () => {
+    const response = await request.patch("/tasks/99999");
+
+    const expectedBody = {
+      message: "Task not found",
+    };
+
+    expect(response.body).toEqual(expectedBody);
+    expect(response.statusCode).toBe(404);
   });
 
-  it("should throw error when try to update a task with invalid data types", async () => {
+  it("should return an error updating a task with invalid data types", async () => {
+    const invalidDataUpdateTask = {
+      title: 123,
+      content: 123,
+      finished: "testing",
+    };
+
     const task = await prisma.task.findFirst();
-
-    await request
+    const response = await request
       .patch(`/tasks/${task?.id}`)
-      .send(invalidDataUpdateTask)
-      .expect(400);
+      .send(invalidDataUpdateTask);
+
+    const expectedBody = {
+      errors: [
+        {
+          code: "invalid_type",
+          expected: "string",
+          received: "number",
+          path: ["title"],
+          message: "Expected string, received number",
+        },
+        {
+          code: "invalid_type",
+          expected: "string",
+          received: "number",
+          path: ["content"],
+          message: "Expected string, received number",
+        },
+        {
+          code: "invalid_type",
+          expected: "boolean",
+          received: "string",
+          path: ["finished"],
+          message: "Expected boolean, received string",
+        },
+      ],
+    };
+
+    expect(response.body).toEqual(expectedBody);
+    expect(response.statusCode).toBe(400);
   });
 });
