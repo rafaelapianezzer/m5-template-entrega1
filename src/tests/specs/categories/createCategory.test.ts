@@ -1,30 +1,62 @@
 import { describe, expect, it } from "vitest";
-import { category, invalidDataCategory } from "../../mocks/category.mocks";
 import { request } from "../../setupFiles";
 
 describe("create category", async () => {
   it("should be able to create category successfully", async () => {
-    const data = await request
+    const category = {
+      name: "Example",
+    };
+    const response = await request.post("/categories").send(category);
+
+    const expectedBody = {
+      id: expect.any(Number),
+      name: category.name,
+    };
+
+    expect(response.body).toEqual(expectedBody);
+    expect(response.statusCode).toBe(201);
+  });
+
+  it("should return an error when creating a category with empty body", async () => {
+    const response = await request.post("/categories").send({});
+
+    const expectedBody = {
+      errors: [
+        {
+          code: "invalid_type",
+          expected: "string",
+          received: "undefined",
+          path: ["name"],
+          message: "Required",
+        },
+      ],
+    };
+
+    expect(response.body).toEqual(expectedBody);
+    expect(response.statusCode).toBe(400);
+  });
+
+  it("should return an error when creating a category with invalid name type", async () => {
+    const invalidDataCategory = {
+      name: 123,
+    };
+    const response = await request
       .post("/categories")
-      .send(category)
-      .expect(201)
-      .then((response) => response.body);
+      .send(invalidDataCategory);
 
-    expect(data).toBeDefined();
-    expect(data).toBeTypeOf("object");
+    const expectedBody = {
+      errors: [
+        {
+          code: "invalid_type",
+          expected: "string",
+          received: "number",
+          path: ["name"],
+          message: "Expected string, received number",
+        },
+      ],
+    };
 
-    expect(data.id).toBeDefined();
-    expect(data.id).toBeTypeOf("number");
-
-    expect(data.name).toBeDefined();
-    expect(data.name).toBeTypeOf("string");
-  });
-
-  it("should throw error when try to create a task with a missing body parameter", async () => {
-    await request.post("/categories").expect(400);
-  });
-
-  it("should throw error when try to create a task with invalid data types", async () => {
-    await request.post("/categories").send(invalidDataCategory).expect(400);
+    expect(response.body).toEqual(expectedBody);
+    expect(response.statusCode).toBe(400);
   });
 });
