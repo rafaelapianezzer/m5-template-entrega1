@@ -1,19 +1,25 @@
-import { beforeEach, describe, it } from "vitest";
+import { beforeEach, describe, it, expect } from "vitest";
 import { prisma } from "../../../database/prisma";
-import { category } from "../../mocks/category.mocks";
 import { request } from "../../setupFiles";
 
 describe("delete category", () => {
   beforeEach(async () => {
-    await prisma.category.create({ data: category });
+    await prisma.category.create({ data: { name: "Example" } });
   });
 
-  it("should be able to delete category successfully", async () => {
+  it("should be able to delete a category successfully", async () => {
     const category = await prisma.category.findFirst();
     await request.delete(`/categories/${category?.id}`).expect(204);
   });
 
-  it("should throw error when try to delete a invalid category", async () => {
-    await request.delete("/categories/999").expect(404);
+  it("should return an error when deleting a category with non existing id", async () => {
+    const response = await request.delete("/categories/99999");
+
+    const expectedBody = {
+      message: "Category not found",
+    };
+
+    expect(response.body).toEqual(expectedBody);
+    expect(response.statusCode).toBe(404);
   });
 });
